@@ -62,6 +62,16 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
+  if (!body.name || !body.number ) {
+    // 400 = "Bad Request"
+    return response.status(400).json({ error: 'content missing' })
+  }
+
+  if (phonebook.find(person => person.name == body.name)) {
+    // 409 = "Conflict"
+    return response.status(409).json({ error: 'name already exists' })
+  }
+
   const new_id = Math.floor(Math.random() * 1000)
 
   const new_person = {
