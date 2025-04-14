@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+app.use(express.json())
 
 let phonebook = [
     { 
@@ -28,6 +29,14 @@ app.get('/', (request, response) => {
   response.send('HOMEPAGE')
 })
 
+app.get('/info', (request, response) => {
+  response.send(
+    `
+    <p>Phonebook has ${phonebook.length} people.</p>
+    <p>${new Date()}
+    `)
+})
+
 app.get('/api/persons', (request, response) => {
   response.json(phonebook)
 })
@@ -38,18 +47,31 @@ app.get('/api/persons/:id', (request, response) => {
   if (found) {
     response.json(found)
   } else {
+    // 404 = "Resource Not Found"
     response.status(404).json({ error: 'Person not found' })
   }
 })
 
-app.get('/info', (request, response) => {
-  response.send(
-    `
-    <p>Phonebook has ${phonebook.length} people.</p>
-    <p>${new Date()}
-    `)
+app.delete('/api/persons/:id', (request, response) => {
+  const id = request.params.id 
+  phonebook = phonebook.filter(person => person.id !== id)
+
+  // 204 = "No Content"
+  response.status(204).end()
 })
 
+app.post('/api/persons', (request, response) => {
+  const body = request.body
+  const new_id = Math.floor(Math.random() * 1000)
+
+  const new_person = {
+    name: body.name,
+    number: body.number,
+    id: new_id,
+  }
+  phonebook = phonebook.concat(new_person)
+  response.json(new_person)
+})
 
 const PORT = 3001
 app.listen(PORT, () => {
