@@ -32,6 +32,16 @@ app.get('/api/persons', (request, response) => {
   response.json(phonebook)
 })
 
+app.get('/api/persons/:id', (request, response) => {
+  const id = request.params.id
+  const found = phonebook.find(person => person.id == id)
+  if (found) {
+    response.json(found)
+  } else {
+    response.status(404).json({ error: 'Person not found' })
+  }
+})
+
 app.get('/info', (request, response) => {
   response.send(
     `
